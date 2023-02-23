@@ -213,6 +213,8 @@ class PushWidgetImpl : public PushWidget, public IOBSOutputEventHanlder
         auto v_keyframe_sec = QJsonUtil::Get(conf_, "v-keyframe-sec", 3);
         auto a_mixer = QJsonUtil::Get(conf_, "a-mixer", 0);
         auto v_bframes = QJsonUtil::Get<int>(conf_, "v-bframes");
+        auto v_preset = QJsonUtil::Get<std::string>(conf_, "v-preset");
+        auto v_multipass = QJsonUtil::Get<std::string>(conf_, "v-multipass");
         auto resolution = QJsonUtil::Get<std::string>(conf_, "v-resolution");
         int v_width = -1, v_height = -1;
         
@@ -271,6 +273,8 @@ class PushWidgetImpl : public PushWidget, public IOBSOutputEventHanlder
             obs_data_set_int(settings, "keyint_sec", v_keyframe_sec);
             if (v_bframes.has_value())
                 obs_data_set_int(settings, "bf", v_bframes.value());
+            obs_data_set_string(settings, "preset2", "p5");
+            obs_data_set_string(settings, "multipass", "disabled");
             venc = obs_video_encoder_create(venc_id.c_str(), "multi-rtmp-video-encoder", settings, nullptr);
             obs_data_release(settings);
             obs_encoder_set_video(venc, obs_get_video());
