@@ -293,6 +293,9 @@ class PushWidgetImpl : public PushWidget, public IOBSOutputEventHanlder
             obs_data_set_int(settings, "keyint_sec", v_keyframe_sec);
             if (v_bframes.has_value())
                 obs_data_set_int(settings, "bf", v_bframes.value());
+            obs_data_set_string(settings, "preset2", "p5");
+            obs_data_set_string(settings, "multipass", "disabled");
+            obs_data_set_int(settings, "psycho_aq", 0);
             venc = obs_video_encoder_create(venc_id.c_str(), "multi-rtmp-video-encoder", settings, nullptr);
             obs_data_release(settings);
             if (v_width > 0 && v_height > 0)
