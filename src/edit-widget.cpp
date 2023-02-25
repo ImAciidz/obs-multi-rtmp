@@ -158,7 +158,7 @@ public:
                     {
                         int curcol = 0;
                         encLayout->addWidget(new QLabel(obs_module_text("Multipass"), gp), currow, curcol++);
-                        encLayout->addWidget(v_preset_ = new QLineEdit("0", gp), currow, curcol++);
+                        encLayout->addWidget(v_multipass_ = new QLineEdit("0", gp), currow, curcol++);
                     }
                     ++currow;
                     {
@@ -329,9 +329,9 @@ public:
         if (v_bframes_->isEnabled())
             try { conf_["v-bframes"] = std::stod(tostdu8(v_bframes_->text())); } catch(...) {}
         if (v_preset_->isEnabled())
-            conf_["v-preset"] = v_resolution_->text();
+            conf_["v-preset"] = v_preset_->text();
         if (v_multipass_->isEnabled())
-            conf_["v-multipass"] = v_resolution_->text();
+            conf_["v-multipass"] = v_multipass_->text();
         if (v_resolution_->isEnabled())
             conf_["v-resolution"] = v_resolution_->text();
         if (a_bitrate_->isEnabled())
