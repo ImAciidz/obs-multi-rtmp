@@ -8,27 +8,27 @@ class IOBSOutputEventHanlder
 {
 public:
     virtual void OnStarting() {}
-    static void OnOutputStarting(void* x, calldata_t* param)
+    static void OnOutputStarting(void* x, calldata_t*)
     {
         auto thiz = static_cast<IOBSOutputEventHanlder*>(x);
         thiz->OnStarting();
     }
 
     virtual void OnStarted() {}
-    static void OnOutputStarted(void* x, calldata_t* param)
+    static void OnOutputStarted(void* x, calldata_t*)
     {
         auto thiz = static_cast<IOBSOutputEventHanlder*>(x);
         thiz->OnStarted();
     }
 
     virtual void OnStopping() {}
-    static void OnOutputStopping(void* x, calldata_t* param)
+    static void OnOutputStopping(void* x, calldata_t*)
     {
         auto thiz = static_cast<IOBSOutputEventHanlder*>(x);
         thiz->OnStopping();
     }
    
-    virtual void OnStopped(int code) {}
+    virtual void OnStopped(int) {}
     static void OnOutputStopped(void* x, calldata_t* param)
     {
         auto thiz = static_cast<IOBSOutputEventHanlder*>(x);
@@ -36,21 +36,21 @@ public:
     }
 
     virtual void OnReconnect() {}
-    static void OnOutputReconnect(void* x, calldata_t* param)
+    static void OnOutputReconnect(void* x, calldata_t*)
     {
         auto thiz = static_cast<IOBSOutputEventHanlder*>(x);
         thiz->OnReconnect();
     }
 
     virtual void OnReconnected() {}
-    static void OnOutputReconnected(void* x, calldata_t* param)
+    static void OnOutputReconnected(void* x, calldata_t*)
     {
         auto thiz = static_cast<IOBSOutputEventHanlder*>(x);
         thiz->OnReconnected();
     }
 
     virtual void onDeactive() {}
-    static void OnOutputDeactive(void* x, calldata_t* param)
+    static void OnOutputDeactive(void* x, calldata_t*)
     {
         auto thiz = static_cast<IOBSOutputEventHanlder*>(x);
         thiz->onDeactive();
@@ -107,7 +107,23 @@ class PushWidgetImpl : public PushWidget, public IOBSOutputEventHanlder
     QPushButton* remove_btn_ = 0;
 
     obs_output_t* output_ = 0;
+    obs_view_t* scene_view_ = 0;
+    video_t* scene_video_ = 0;
     bool isUseDelay_ = false;
+
+    bool ReleaseSceneView() {
+        if (video_output_active(scene_video_))
+            return false;
+
+        video_output_close(scene_video_);
+        scene_video_ = nullptr;
+        obs_view_remove(scene_view_);
+        obs_view_set_source(scene_view_, 0, nullptr);
+        obs_view_destroy(scene_view_);
+        scene_view_ = nullptr;
+
+        return true;
+    }
 
     bool ReleaseOutputService()
     {
@@ -195,6 +211,7 @@ class PushWidgetImpl : public PushWidget, public IOBSOutputEventHanlder
         ReleaseOutputEncoder();
 
         // read config
+        auto v_scene = QJsonUtil::Get(conf_, "v-scene", std::string{});
         auto venc_id = QJsonUtil::Get(conf_, "v-enc", std::string{});
         auto aenc_id = QJsonUtil::Get(conf_, "a-enc", std::string{});
         auto v_bitrate = QJsonUtil::Get(conf_, "v-bitrate", 2000);
@@ -241,20 +258,22 @@ class PushWidgetImpl : public PushWidget, public IOBSOutputEventHanlder
             if (venc_id.empty())
             {
                 venc = obs_output_get_video_encoder(stream_out);
-                obs_encoder_addref(venc);
+                venc = obs_encoder_get_ref(venc);
             }
             if (aenc_id.empty())
             {
                 aenc = obs_output_get_audio_encoder(stream_out, 0);
-                obs_encoder_addref(aenc);
+                aenc = obs_encoder_get_ref(aenc);
             }
 
             obs_output_release(stream_out);
         }
 
-        // create encoders
+        // create video encoder
         if (!venc)
         {
+            if (venc_id.empty())
+                return false;
             obs_data_t* settings = obs_data_create();
             obs_data_set_int(settings, "bitrate", v_bitrate);
             obs_data_set_int(settings, "keyint_sec", v_keyframe_sec);
@@ -265,23 +284,39 @@ class PushWidgetImpl : public PushWidget, public IOBSOutputEventHanlder
             obs_data_set_int(settings, "psycho_aq", 0);
             venc = obs_video_encoder_create(venc_id.c_str(), "multi-rtmp-video-encoder", settings, nullptr);
             obs_data_release(settings);
-            obs_encoder_set_video(venc, obs_get_video());
             if (v_width > 0 && v_height > 0)
             {
                 obs_encoder_set_scaled_size(venc, v_width, v_height);
             }
         }
 
+        if (v_scene.empty()) {
+            obs_encoder_set_video(venc, obs_get_video());
+        } else {
+            auto scene = obs_get_source_by_name(v_scene.c_str());
+            if (scene == nullptr)
+                return false;
+            ReleaseSceneView();
+            scene_view_ = obs_view_create();
+            obs_view_set_source(scene_view_, 0, scene);
+            obs_source_release(scene);
+            scene_video_ = obs_view_add(scene_view_);
+            obs_encoder_set_video(venc, scene_video_);
+        }
+        obs_output_set_video_encoder(output_, venc);
+
+        // create audio encoder
         if (!aenc)
         {
+            if (aenc_id.empty())
+                return false;
             obs_data_t* settings = obs_data_create();
             obs_data_set_int(settings, "bitrate", a_bitrate);
             aenc = obs_audio_encoder_create(aenc_id.c_str(), "multi-rtmp-audio-encoder", settings, a_mixer, nullptr);
             obs_data_release(settings);
-            obs_encoder_set_audio(aenc, obs_get_audio());
         }
 
-        obs_output_set_video_encoder(output_, venc);
+        obs_encoder_set_audio(aenc, obs_get_audio());
         obs_output_set_audio_encoder(output_, aenc, 0);
 
         if (!aenc || !venc)
@@ -310,6 +345,8 @@ class PushWidgetImpl : public PushWidget, public IOBSOutputEventHanlder
 
             obs_output_release(output_);
             output_ = nullptr;
+
+            ReleaseSceneView();
 
             return ret;
         }
