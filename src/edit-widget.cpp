@@ -249,6 +249,8 @@ public:
             venc_->addItem(obs_encoder_get_display_name(x.c_str()), x.c_str());
         for(auto x : EnumEncodersByCodec("hevc"))
             venc_->addItem(obs_encoder_get_display_name(x.c_str()), x.c_str());
+        for(auto x : EnumEncodersByCodec("av1"))
+            venc_->addItem(obs_encoder_get_display_name(x.c_str()), x.c_str());
         
         aenc_->addItem(obs_module_text("SameAsOBS"), "");
         for(auto x : EnumEncodersByCodec("AAC"))
