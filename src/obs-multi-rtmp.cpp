@@ -12,6 +12,8 @@
 #include <Windows.h>
 #endif
 
+#include "obs.hpp"
+
 #define ConfigSection "obs-multi-rtmp"
 
 static class GlobalServiceImpl : public GlobalService
@@ -263,6 +265,20 @@ public:
 
     void LoadConfig()
     {
+	    // cock
+	    
+	    //OBSEncoder PENIS = obs_output_get_video_encoder(BALLS);
+	    //obs_output_release(BALLS);
+	    /* if (PENIS) {
+	        blog(LOG_INFO, "PENIS encoder found!");
+	    } else {
+	        blog(LOG_INFO, "PENIS encoder is null");
+	    }*/
+	    //obs_encoder_release(PENIS);
+	    //obs_encoder_set_frame_rate_divisor(PENIS, 2);
+	    //obs_encoder_set_gpu_scale_type(videoStreaming, OBS_SCALE_BICUBIC);
+	    //obs_encoder_set_gpu_scale_type(PENIS, OBS_SCALE_LANCZOS);
+        
         for(auto x: GetAllPushWidgets()) {
             delete x;
         }
@@ -324,6 +340,12 @@ bool obs_module_load()
             else if (event == obs_frontend_event::OBS_FRONTEND_EVENT_PROFILE_CHANGED)
             {
                 mainwin->LoadConfig();
+		        /* OBSOutput BALLS = obs_frontend_get_recording_output();
+		        obs_output_release(BALLS);
+			    OBSEncoder PENIS = obs_output_get_video_encoder(BALLS);
+			    obs_encoder_set_frame_rate_divisor(PENIS, 2);
+                obs_encoder_release(PENIS);
+			    obs_encoder_set_frame_rate_divisor(PENIS, 2);*/
             }
         }, dock
     );

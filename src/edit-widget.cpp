@@ -31,6 +31,7 @@ class EditOutputWidgetImpl : public EditOutputWidget
     QLineEdit* v_bitrate_ = 0;
     QLineEdit* v_keyframe_sec_ = 0;
     QLineEdit* v_bframes_ = 0;
+    QLineEdit* v_divisor_ = 0;
     QLineEdit* v_resolution_ = 0;
     QLabel* v_share_notify_ = 0;
 
@@ -296,6 +297,12 @@ public:
                     }
                     ++currow;
                     {
+                        int curcol = 0;
+                        encLayout->addWidget(new QLabel(obs_module_text("FPSDivisor"), gp), currow, curcol++);
+                        encLayout->addWidget(v_divisor_ = new QLineEdit("1", gp), currow, curcol++);
+                    }
+                    ++currow;
+                    {
                         encLayout->addWidget(new QWidget(), currow, 0);
                         encLayout->setRowStretch(currow, 1);
                     }
@@ -452,6 +459,8 @@ public:
             v_keyframe_sec_->setText(obs_module_text("SameAsOBS"));
             v_bframes_->setEnabled(false);
             v_bframes_->setText(obs_module_text("SameAsOBS"));
+            v_divisor_->setEnabled(false);
+            v_divisor_->setText(obs_module_text("SameAsOBS"));
         }
         else
         {
@@ -460,6 +469,7 @@ public:
             v_resolution_->setEnabled(true);
             v_keyframe_sec_->setEnabled(true);
             v_bframes_->setEnabled(true);
+            v_divisor_->setEnabled(true);
         }
 
         auto makeShareNotify = [&](auto& targets) {
@@ -551,6 +561,12 @@ public:
         it->encoderParams["bitrate"] = ParseStringToInt(v_bitrate_->text()).value_or(2000);
         it->encoderParams["keyint_sec"] = ParseStringToInt(v_keyframe_sec_->text()).value_or(3);
         it->encoderParams["bf"] = ParseStringToInt(v_bframes_->text()).value_or(2);
+        
+        auto divisor = v_divisor_->text().toUtf8();
+        if (!divisor.isEmpty())
+            it->divisor = divisor.constData();
+        else
+            it->divisor.reset();
     }
 
     void SaveAudioConfig() {
@@ -660,6 +676,10 @@ public:
         v_bframes_->setText(QString::fromUtf8(
             std::to_string(GetJsonField<int>(config.encoderParams, "bf").value_or(2))
         ));
+
+        v_divisor_->setText(QString::fromUtf8(
+		    config.divisor.value_or("1")
+        )); //ParseStringToInt(config.divisor->text()).value_or(1)
 
         v_resolution_->setText(QString::fromUtf8(
             config.resolution.value_or("")

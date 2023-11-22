@@ -15,6 +15,7 @@ struct VideoEncoderConfig {
     nlohmann::json encoderParams;
     std::optional<std::string> outputScene;
     std::optional<std::string> resolution;
+    std::optional<std::string> divisor;
 };
 using VideoEncoderConfigPtr = std::shared_ptr<VideoEncoderConfig>;
 

@@ -1,31 +1,31 @@
 {
     "dependencies": {
         "obs-studio": {
-            "version": "29.1.1",
+            "version": "29.1.0-543-g672115492",
             "repository": "https://github.com/obsproject/obs-studio.git",
             "branch": "master",
-            "hash": "c289efd84a42887feba89c3579d39a9c264b749e"
+            "hash": "67211549249b0a8c4d93fd0ff3e3d062f16c6028"
         },
         "prebuilt": {
-            "version": "2023-04-12",
+            "version": "2023-08-08",
             "baseUrl": "https://github.com/obsproject/obs-deps/releases/download",
             "label": "Pre-built obs-deps",
             "hashes": {
-                "windows-x64": "c13a14a1acc4224b21304d97b63da4121de1ed6981297e50496fbc474abc0503",
-                "windows-x86": "21d05bab23dabe8dcf21519e31eead64b24e4b5d087c0e766f75adafa9276a09"
+                "windows-x64": "676758d4f03a905245559e4d5eb8c04c503dcf6ec49de2c760ca49dcd9c833d1",
+                "windows-x86": "a579c36aaab5b558520abe8716ee6728cb6e314e8f168abd303364ec735c820b"
             }
         },
         "qt6": {
-            "version": "2023-04-12",
+            "version": "2023-08-08",
             "baseUrl": "https://github.com/obsproject/obs-deps/releases/download",
             "label": "Pre-built Qt6",
             "hashes": {
-                "windows-x64": "4d39364b8a8dee5aa24fcebd8440d5c22bb4551c6b440ffeacce7d61f2ed1add",
-                "windows-x86": "e67494698f2e6ac284a5640b64a687c971e868de7223cc06cabe794c57d632e2"
+                "windows-x64": "aa155f4830a8cdabfe0f4b1bb027a7712b4773f25986f4b4fce082a1ff75057c",
+                "windows-x86": "1b4f5fc5ebe8511a5c65fc4388290ea1e3c4874472425fa626bb137108c5c417"
             },
             "pdb-hashes": {
-                "windows-x64": "f34ee5067be19ed370268b15c53684b7b8aaa867dc800b68931df905d679e31f",
-                "windows-x86": "70f2c23fb937a94cc38cc3716e8b34f3710e233626da9439e9077d3dac0ebd0d"
+                "windows-x64": "60aaa0972b42136a13e079de7d735714c6cc1057951348a2f3ed3655450866d8",
+                "windows-x86": "7966663ed5f6f53dcc4d0cbf0f362a87921c829983cf63f72f111607529e31c8"
             }
         }
     },

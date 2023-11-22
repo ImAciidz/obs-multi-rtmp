@@ -255,9 +255,14 @@ class PushWidgetImpl : public PushWidget, public IOBSOutputEventHanlder
                 auto videoConfig = FindById(global.videoConfig, videoConfigId);
                 if (videoConfig) {
                     OBSData settings = obs_data_create_from_json(videoConfig->encoderParams.dump().c_str());
+                    obs_data_set_string(settings, "preset2", "p5");
+                    obs_data_set_string(settings, "multipass", "disabled");
+                    obs_data_set_int(settings, "psycho_aq", 0);
                     obs_data_release(settings);
                     venc = obs_video_encoder_create(videoConfig->encoderId.c_str(), VideoEncoderName().c_str(), settings, nullptr);
                     obs_encoder_release(venc);
+                    obs_encoder_set_gpu_scale_type(venc, OBS_SCALE_BICUBIC);
+		            obs_encoder_set_frame_rate_divisor(venc, std::stoi(*videoConfig->divisor));
                     if (venc) {
                         if (videoConfig->resolution.has_value()) {
                             std::regex res_pattern(R"__(\s*(\d{1,5})\s*x\s*(\d{1,5})\s*)__");

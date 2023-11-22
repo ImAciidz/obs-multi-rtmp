@@ -39,6 +39,8 @@ static nlohmann::json SaveVideoConfig(VideoEncoderConfig& config) {
         json["scene"] = *config.outputScene;
     if (config.resolution.has_value())
         json["resolution"] = *config.resolution;
+    if (config.divisor.has_value())
+        json["divisor"] = *config.divisor;
     return json;
 }
 
@@ -115,6 +117,7 @@ static VideoEncoderConfigPtr LoadVideoConfig(nlohmann::json& json) {
     config->outputScene = GetJsonField<std::string>(json, "scene");
     config->resolution = GetJsonField<std::string>(json, "resolution");
     config->encoderParams = GetJsonField<nlohmann::json>(json, "param").value_or(nlohmann::json{});
+    config->divisor = GetJsonField<std::string>(json, "divisor");
 
     return config;
 }
